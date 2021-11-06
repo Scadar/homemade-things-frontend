@@ -3,12 +3,13 @@ import { Avatar, Button, Divider, Menu, MenuItem, Typography } from "@mui/materi
 import faceImage from "../../../static/images/face.png";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { logout } from "../../../store/slices/auth";
+import { useHistory } from "react-router-dom";
 
 const ProfileButton: FC = () => {
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-
+    const history = useHistory();
     const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -63,7 +64,7 @@ const ProfileButton: FC = () => {
                     "aria-labelledby": "profile-button"
                 } }
             >
-                <MenuItem onClick={ closeMenu }>Profile</MenuItem>
+                <MenuItem onClick={ () => history.push("/profile") }>Profile</MenuItem>
                 <MenuItem onClick={ closeMenu }>My account</MenuItem>
                 <MenuItem onClick={ () => dispatch(logout()) }>Logout</MenuItem>
             </Menu>

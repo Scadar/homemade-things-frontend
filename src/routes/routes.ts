@@ -10,7 +10,7 @@ import Settings from "../pages/settings/Settings";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Statistics from "../pages/statistics/Statistics";
 import PieChartOutlineRoundedIcon from "@mui/icons-material/PieChartOutlineRounded";
-import NewHome from "../pages/home/NewHome";
+import Profile from "../pages/profile/Profile";
 
 type RouteType = {
     exact: boolean
@@ -56,8 +56,8 @@ export const routes: RouteType[] = [
     },
     {
         exact: true,
-        Component: NewHome,
-        path: "/statistics/:id",
+        Component: Profile,
+        path: "/profile",
         roles: null
     }
 ];
