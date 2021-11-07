@@ -11,6 +11,8 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Statistics from "../pages/statistics/Statistics";
 import PieChartOutlineRoundedIcon from "@mui/icons-material/PieChartOutlineRounded";
 import Profile from "../pages/profile/Profile";
+import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
+import SellerPersonalAccount from "../sellerPersonalAccount/SellerPersonalAccount";
 
 type RouteType = {
     exact: boolean
@@ -53,6 +55,14 @@ export const routes: RouteType[] = [
         roles: null,
         Icon: PieChartOutlineRoundedIcon,
         title: "Статистика"
+    },
+    {
+        exact: true,
+        Component: SellerPersonalAccount,
+        path: "/seller-account",
+        roles: [Role.ROLE_SELLER],
+        Icon: MapsHomeWorkIcon,
+        title: "Продажа"
     },
     {
         exact: true,
