@@ -23,6 +23,7 @@ import ModalChangeName from "./modalWindowProfile/ModalChangeName";
 import ModalChangeEmail from "./modalWindowProfile/ModalChangeEmail";
 import ModalChangePhone from "./modalWindowProfile/ModalChangePhone";
 import ModalChangeBirthday from "./modalWindowProfile/ModalChangeBirthday";
+import Button from "@mui/material/Button";
 
 const Profile = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -45,7 +46,7 @@ const Profile = () => {
 
   const [userFio, setUserFio] = React.useState({});
   const handleSaveUserFio = (UserFio) => {
-    setUserFio(UserFio)
+    setUserFio(UserFio);
   };
 
   const [gender, setGender] = React.useState("");
@@ -108,7 +109,14 @@ const Profile = () => {
             </label>
           </Stack>
         </Box>
-        <Box sx={{ marginLeft: "15px", display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            marginLeft: "15px",
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
           <Typography variant="h4" sx={{ paddingBottom: "25px" }}>
             Не указано
           </Typography>
@@ -125,6 +133,14 @@ const Profile = () => {
               <EditIcon />
             </Fab>
           </Box>
+          <Button
+            size="large"
+            color="secondary"
+            variant="contained"
+            sx={{ height: "40px", weight: "50px", marginLeft: "auto" }}
+          >
+            Войти как продавец
+          </Button>
         </Box>
       </Box>
       <ModalChangeName
