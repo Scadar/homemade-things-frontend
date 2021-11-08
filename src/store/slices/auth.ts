@@ -22,6 +22,11 @@ const loginSlice = createSlice({
         },
         setGlobalLoading(state, action: PayloadAction<boolean>) {
             state.globalLoading = action.payload;
+        },
+        setCurrentUserFirstName(state, action: PayloadAction<string>) {
+            if(state.user){
+                state.user.firstName = action.payload;
+            }
         }
     }
 });
@@ -35,7 +40,8 @@ export const logout = () =>
 
 export const {
     setAuthUser,
-    setGlobalLoading
+    setGlobalLoading,
+    setCurrentUserFirstName
 } = loginSlice.actions;
 
 export default loginSlice.reducer;

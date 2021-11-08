@@ -10,9 +10,13 @@ import ProfileModal from "./modalWindowProfile/ProfileModal";
 import ProfileCard, { ProfileCardProps } from "./profileCard/ProfileCard";
 import SexCard from "./profileCard/SexCard";
 import UserCard from "./profileCard/UserCard";
-import { useAppSelector } from "../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { IUser } from "../../models/userModel";
 import { flexStyles } from "../../utils/styleUtils";
+import { userApi } from "../../services/userService";
+import { Role, useRoleManager } from "../../utils/roleUtils";
+import { useSnackbar } from "notistack";
+import { logout } from "../../store/slices/auth";
 
 export type ProfileModalType = "birthday" | "email" | "name" | "phone"
 
@@ -40,8 +44,21 @@ const getFullName = (user: IUser | null): string => {
 
 const Profile: FC = () => {
 
+    const [addSellerRole, { isLoading: addSellerRoleLoading }] = userApi.useFetchAddSellerRoleMutation();
+    const hasAnyRole = useRoleManager();
     const { user } = useAppSelector(state => state.auth);
     const [modal, setModal] = useState<ProfileModalType | null>(null);
+    const { enqueueSnackbar } = useSnackbar();
+    const dispatch = useAppDispatch();
+
+    const onClickAddSellerRole = () => {
+        addSellerRole()
+        .unwrap()
+        .then(() => {
+            enqueueSnackbar("Роль успешно добавлена, перезайдите в аккаунт", { variant: "success" });
+            dispatch(logout());
+        });
+    };
 
     const cards: ProfileCardProps[] = useMemo(() => {
         return [
@@ -69,7 +86,7 @@ const Profile: FC = () => {
                 children: <SexCard/>
             }
         ];
-    }, [])
+    }, []);
 
     return (
         <>
@@ -116,18 +133,27 @@ const Profile: FC = () => {
                     </Typography>
                 </Box>
 
+                {
+                    hasAnyRole([Role.ROLE_SELLER]) ?
+                        <Typography>
+                            Вы уже продавец
+                        </Typography>
+                        :
+                        <Button
+                            size="large"
+                            color="secondary"
+                            variant="contained"
+                            sx={ {
+                                height: theme => theme.spacing(5),
+                                ml: "auto"
+                            } }
+                            disabled={ addSellerRoleLoading }
+                            onClick={ onClickAddSellerRole }
+                        >
+                            Войти как продавец
+                        </Button>
+                }
 
-                <Button
-                    size="large"
-                    color="secondary"
-                    variant="contained"
-                    sx={ {
-                        height: theme => theme.spacing(5),
-                        ml: "auto"
-                    } }
-                >
-                    Войти как продавец
-                </Button>
             </Box>
 
             <Box
