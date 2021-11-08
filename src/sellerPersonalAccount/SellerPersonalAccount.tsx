@@ -1,47 +1,58 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, IconButton, TextField, Tooltip } from "@mui/material";
+import { Box, Button, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { FieldArray, FormikProvider, useFormik } from "formik";
 import { IGood } from "../models/goodModel";
-import { useDropzone } from "react-dropzone";
 import { goodsApi } from "../services/goodsService";
+import AppDropzone from "../components/UI/AppDropzone";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CloseIcon from "@mui/icons-material/Close";
+import * as yup from "yup";
+import { flexStyles } from "../utils/styleUtils";
 
-const thumbsContainer = {
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 16
-} as const;
+const specificationArrayValidation = yup.object({
+    title: yup
+    .string()
+    .min(1, "Минимум 1 символ")
+    .max(30, "Максимум 30 символов")
+    .required("Название спецификации обязательно"),
+    value: yup
+    .string()
+    .min(1, "Минимум 1 символ")
+    .max(30, "Максимум 30 символов")
+    .required("Значение спецификации обязательно")
+});
 
-const thumb = {
-    display: "inline-flex",
-    borderRadius: 2,
-    border: "1px solid #eaeaea",
-    marginBottom: 8,
-    marginRight: 8,
-    width: 100,
-    height: 100,
-    padding: 4,
-    boxSizing: "border-box"
-} as const;
-
-const thumbInner = {
-    display: "flex",
-    minWidth: 0,
-    overflow: "hidden"
-};
-
-const img = {
-    display: "block",
-    width: "auto",
-    height: "100%"
-};
+const validationSchema = yup.object({
+    title: yup
+    .string()
+    .min(5, "Минимум 5 символов")
+    .max(50, "Максимум 50 символов")
+    .required("Название товара обязательно"),
+    price: yup
+    .number()
+    .min(100, "Минимальная цена 100 рублей")
+    .positive("Цена должна быть положительной")
+    .required("Цена обязательна"),
+    discount: yup
+    .number()
+    .min(0, "Минимальная скидка 0%")
+    .max(99, "Максимальная скидка 99%"),
+    description: yup
+    .string()
+    .min(5, "Минимум 5 символов")
+    .max(2500, "Максимум 2500 символов")
+    .required("Описание товара обязательно"),
+    specifications: yup
+    .array()
+    .of(specificationArrayValidation)
+});
 
 const SellerPersonalAccount: FC = () => {
 
     const [addGoodOpen, setAddGoodOpen] = useState(true);
+    const [createGood] = goodsApi.useFetchCreateGoodMutation();
     const [files, setFiles] = useState<File[]>([]);
-    const [createGood] = goodsApi.useFetchCreateGoodMutation()
 
     const formik = useFormik<IGood>({
         initialValues: {
@@ -49,8 +60,9 @@ const SellerPersonalAccount: FC = () => {
             price: 0,
             discount: 0,
             description: "",
-            specifications: []
+            specifications: [{ title: "", value: "" }]
         },
+        validationSchema,
         onSubmit: async values => {
             await createGood({
                 title: values.title,
@@ -58,38 +70,10 @@ const SellerPersonalAccount: FC = () => {
                 price: values.price,
                 discount: values.discount,
                 description: values.description,
-                specifications: values.specifications,
-            })
-        }
-    });
-
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: "image/*",
-        onDrop: acceptedFiles => {
-            setFiles(prevFiles => {
-                return prevFiles.concat(
-                    acceptedFiles.map(file => Object.assign(file, {
-                        preview: URL.createObjectURL(file)
-                    }))
-                );
+                specifications: values.specifications
             });
         }
     });
-
-    const thumbs = files.map(file => (
-        <div style={ thumb } key={ file.name }>
-            <div style={ thumbInner }>
-                {/*@ts-ignore*/ }
-                <img src={ file.preview } style={ img }/>
-            </div>
-        </div>
-    ));
-
-    useEffect(() => () => {
-        // Make sure to revoke the data uris to avoid memory leaks
-        //@ts-ignore
-        files.forEach(file => URL.revokeObjectURL(file.preview));
-    }, [files]);
 
     return (
         <Box>
@@ -101,101 +85,175 @@ const SellerPersonalAccount: FC = () => {
 
             {
                 addGoodOpen &&
-                <FormikProvider value={ formik }>
-                    <form onSubmit={ formik.handleSubmit }>
-                        <TextField
-                            fullWidth
-                            id="add-good-title"
-                            name="title"
-                            label="title"
-                            value={ formik.values.title }
-                            onChange={ formik.handleChange }
-                            error={ formik.touched.title && Boolean(formik.errors.title) }
-                            helperText={ formik.touched.title && formik.errors.title }
-                        />
-                        <TextField
-                            fullWidth
-                            type={ "number" }
-                            id="add-good-price"
-                            name="price"
-                            label="price"
-                            value={ formik.values.price }
-                            onChange={ formik.handleChange }
-                            error={ formik.touched.price && Boolean(formik.errors.price) }
-                            helperText={ formik.touched.price && formik.errors.price }
+                <Box>
+                    <Typography
+                        variant={ "h4" }
+                        sx={ {
+                            my: theme => theme.spacing(2)
+                        } }
+                    >
+                        Добавление товара
+                    </Typography>
 
-                        />
-                        <TextField
-                            fullWidth
-                            type={ "number" }
-                            id="add-good-discount"
-                            name="discount"
-                            label="discount"
-                            value={ formik.values.discount }
-                            onChange={ formik.handleChange }
-                            error={ formik.touched.discount && Boolean(formik.errors.discount) }
-                            helperText={ formik.touched.discount && formik.errors.discount }
-
-                        />
-                        <TextField
-                            fullWidth
-                            id="add-good-description"
-                            name="description"
-                            label="description"
-                            multiline
-                            rows={ 5 }
-                            value={ formik.values.description }
-                            onChange={ formik.handleChange }
-                            error={ formik.touched.description && Boolean(formik.errors.description) }
-                            helperText={ formik.touched.description && formik.errors.description }
-                        />
-                        <FieldArray
-                            name="specifications"
-                            render={ (arrayHelpers) => (
-                                <div>
-                                    { formik.values.specifications.map((specification, index) => (
-                                        <div key={ index }>
-                                            <TextField
-                                                name={ `specifications[${ index }].title` }
-                                                value={ formik.values.specifications[index].title }
-                                                onChange={ formik.handleChange }
-                                            />
-                                            <TextField
-                                                name={ `specifications.${ index }.value` }
-                                                value={ formik.values.specifications[index].value }
-                                                onChange={ formik.handleChange }
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={ () => arrayHelpers.remove(index) }
+                    <FormikProvider value={ formik }>
+                        <form onSubmit={ formik.handleSubmit }>
+                            <Stack spacing={ 3 } direction={ "column" }>
+                                <TextField
+                                    id="add-good-title"
+                                    name="title"
+                                    label="Название товара"
+                                    value={ formik.values.title }
+                                    onChange={ formik.handleChange }
+                                    error={ formik.touched.title && Boolean(formik.errors.title) }
+                                    helperText={ formik.touched.title && formik.errors.title }
+                                />
+                                <TextField
+                                    type={ "number" }
+                                    id="add-good-price"
+                                    name="price"
+                                    label="Цена товара"
+                                    value={ formik.values.price }
+                                    onChange={ formik.handleChange }
+                                    error={ formik.touched.price && Boolean(formik.errors.price) }
+                                    helperText={ formik.touched.price && formik.errors.price }
+                                    InputProps={ { startAdornment: <AttachMoneyIcon/> } }
+                                />
+                                <TextField
+                                    type={ "number" }
+                                    id="add-good-discount"
+                                    name="discount"
+                                    label="Скидка в процентах"
+                                    value={ formik.values.discount }
+                                    onChange={ formik.handleChange }
+                                    error={ formik.touched.discount && Boolean(formik.errors.discount) }
+                                    helperText={ formik.touched.discount && formik.errors.discount }
+                                    InputProps={ {
+                                        startAdornment:
+                                            <Typography
+                                                variant={ "h6" }
+                                                sx={ {
+                                                    mx: 0.5,
+                                                    fontWeight: 800
+                                                } }
                                             >
-                                                -
-                                            </button>
-                                        </div>
-                                    )) }
-                                    <button
-                                        type="button"
-                                        onClick={ () => arrayHelpers.push({ title: "", value: "" }) }
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            ) }
-                        />
-                        <section className="container">
-                            <div { ...getRootProps({ className: "dropzone" }) }>
-                                <input { ...getInputProps() } />
-                                <p>Drag 'n' drop some files here, or click to select files</p>
-                            </div>
-                            <aside style={ thumbsContainer }>
-                                { thumbs }
-                            </aside>
-                        </section>
-                        <Button color="primary" variant="contained" fullWidth type="submit">
-                            Submit
-                        </Button>
-                    </form>
-                </FormikProvider>
+                                                %
+                                            </Typography>
+                                    } }
+                                />
+                                <TextField
+                                    id="add-good-description"
+                                    name="description"
+                                    label="Описание товара"
+                                    multiline
+                                    rows={ 5 }
+                                    value={ formik.values.description }
+                                    onChange={ formik.handleChange }
+                                    error={ formik.touched.description && Boolean(formik.errors.description) }
+                                    helperText={ formik.touched.description && formik.errors.description }
+                                />
+                                <FieldArray
+                                    name="specifications"
+                                    render={ (arrayHelpers) => (
+                                        <Stack spacing={ 2 } direction={ "column" }>
+                                            { formik.values.specifications.map((specification, index) => {
+                                                console.log(formik);
+
+                                                const getErrorInfo = (
+                                                    obj: "title" | "value",
+                                                    type: "error" | "helperText"
+                                                ): boolean | string => {
+                                                    if (!formik.touched.specifications) {
+                                                        return false;
+                                                    }
+                                                    if (formik.touched.specifications.length === 0) {
+                                                        return false;
+                                                    }
+                                                    if (!formik.touched.specifications[index]) {
+                                                        return false;
+                                                    }
+                                                    if (!formik.touched.specifications[index][obj]) {
+                                                        return false;
+                                                    }
+                                                    if (!formik.errors.specifications) {
+                                                        return false;
+                                                    }
+                                                    if (!formik.errors.specifications[index]) {
+                                                        return false;
+                                                    }
+                                                    //@ts-ignore
+                                                    if (!formik.errors.specifications[index][obj]) {
+                                                        return false;
+                                                    }
+                                                    if (type === "error") {
+                                                        //@ts-ignore
+                                                        return Boolean(formik.errors.specifications[index][obj]);
+                                                    } else {
+                                                        //@ts-ignore
+                                                        return formik.errors.specifications[index][obj];
+                                                    }
+
+                                                };
+
+                                                return (
+                                                    <Box key={ index }>
+                                                        <Stack spacing={ 2 } direction={ "row" }>
+                                                            <TextField
+                                                                name={ `specifications[${ index }].title` }
+                                                                value={ formik.values.specifications[index].title }
+                                                                onChange={ formik.handleChange }
+                                                                label={ "Спецификация" }
+                                                                sx={ { minWidth: 350 } }
+                                                                //@ts-ignore
+                                                                error={ getErrorInfo("title", "error") }
+                                                                helperText={ getErrorInfo("title", "helperText") }
+                                                            />
+                                                            <TextField
+                                                                name={ `specifications.${ index }.value` }
+                                                                value={ formik.values.specifications[index].value }
+                                                                onChange={ formik.handleChange }
+                                                                label={ "Значение спецификации" }
+                                                                sx={ { minWidth: 350 } }
+                                                                //@ts-ignore
+                                                                error={ getErrorInfo("value", "error") }
+                                                                helperText={ getErrorInfo("value", "helperText") }
+                                                            />
+                                                            {
+                                                                index > 0 &&
+                                                                <Box sx={{...flexStyles("center", "center")}}>
+                                                                    <IconButton
+                                                                        onClick={ () => arrayHelpers.remove(index) }
+                                                                    >
+                                                                        <CloseIcon/>
+                                                                    </IconButton>
+                                                                </Box>
+                                                            }
+                                                        </Stack>
+                                                    </Box>
+                                                );
+                                            }) }
+                                            <Box>
+                                                <Button
+                                                    onClick={ () => arrayHelpers.push({ title: "", value: "" }) }
+                                                >
+                                                    Добавить спецификацию
+                                                </Button>
+                                            </Box>
+                                        </Stack>
+                                    ) }
+                                />
+                            </Stack>
+
+                            <Box sx={ { mt: 6 } }>
+                                <Typography variant={ "h6" }>Изображения товара</Typography>
+                                <AppDropzone setValues={ setFiles }/>
+                            </Box>
+                            <Button color="primary" variant="contained" fullWidth type="submit" sx={ { my: 6 } }>
+                                Создать товар
+                            </Button>
+                        </form>
+                    </FormikProvider>
+                </Box>
+
             }
         </Box>
     );
