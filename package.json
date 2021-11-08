@@ -12,6 +12,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/yup": "^0.29.13",
+    "currency.js": "^2.0.4",
     "device-detector-js": "^3.0.0",
     "dotenv": "^10.0.0",
     "formik": "^2.2.9",

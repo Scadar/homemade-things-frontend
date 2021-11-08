@@ -6,20 +6,11 @@ export interface IGoodRequest extends IGood {
     images: File[];
 }
 
-export interface IGoodResponse {
-    id: number;
-    title: string;
-    price: number;
-    discount: number;
-    description: string;
-    specifications: string[];
-}
-
 export const goodsApi = createApi({
     reducerPath: "goodsAPI",
     baseQuery: baseQuery,
     endpoints: (build) => ({
-        fetchCreateGood: build.mutation<IGoodResponse, IGoodRequest>({
+        fetchCreateGood: build.mutation<IGood, IGoodRequest>({
             queryFn: async({ title, images, specifications, discount, price, description },
                            api,
                            extraOptions,
@@ -43,12 +34,16 @@ export const goodsApi = createApi({
                     body: formData
                 });
 
-                console.log(result);
-
                 return result.data
-                    ? { data: result.data as IGoodResponse }
+                    ? { data: result.data as IGood }
                     : { error: result.error as FetchBaseQueryError };
             }
+        }),
+        fetchGetGoods: build.query<IGood[], void>({
+            query: () => ({
+                url: "/good",
+                method: "GET"
+            })
         })
     })
 });
