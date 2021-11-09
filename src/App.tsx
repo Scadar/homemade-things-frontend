@@ -11,7 +11,7 @@ const App: FC = () => {
     const { user, globalLoading } = useAppSelector(state => state.auth);
     //Nikita loh
     authApi.useFetchProfileQuery()
-
+    //sam loh
     if (globalLoading) {
         return <div>Loading</div>;
     }
