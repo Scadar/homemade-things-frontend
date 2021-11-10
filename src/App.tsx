@@ -16,6 +16,7 @@ const App: FC = () => {
         return <div>Loading</div>;
     }
 
+    //qweasd
     if (!user) {
         return (
             <Switch>
