@@ -11,8 +11,8 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Statistics from "../pages/statistics/Statistics";
 import PieChartOutlineRoundedIcon from "@mui/icons-material/PieChartOutlineRounded";
 import Profile from "../pages/profile/Profile";
-import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-import SellerPersonalAccount from "../sellerPersonalAccount/SellerPersonalAccount";
+import MapsHomeWorkIcon from "@mui/icons-material/MapsHomeWork";
+import SellerPersonalAccount from "../pages/sellerPersonalAccount/SellerPersonalAccount";
 
 type RouteType = {
     exact: boolean
