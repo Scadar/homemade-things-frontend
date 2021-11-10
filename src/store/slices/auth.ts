@@ -35,7 +35,7 @@ export const logout = () =>
 
 export const {
     setAuthUser,
-    setGlobalLoading
+    setGlobalLoading,
 } = loginSlice.actions;
 
 export default loginSlice.reducer;
