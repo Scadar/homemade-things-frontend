@@ -7,17 +7,17 @@ const ModalContentEmail: FC = () => {
         <div>
             <Box
                 component="form"
-                sx={{
+                sx={ {
                     "& > :not(style)": { m: 1, width: "25ch" },
-                    maxWidth: "100%",
-                }}
+                    maxWidth: "100%"
+                } }
                 noValidate
                 autoComplete="off"
             >
                 <TextField
                     fullWidth
                     size="medium"
-                    color="secondary"
+                    color="primary"
                     id="fullWidth"
                     label="Укажите новый Email"
                     variant="outlined"

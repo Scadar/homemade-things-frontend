@@ -6,7 +6,7 @@ import { userApi } from "../../../services/userService";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { useSnackbar } from "notistack";
 import { IUser } from "../../../models/userModel";
-import { setCurrentUserFirstName } from "../../../store/slices/auth";
+import { setCurrentUserFirstName, setCurrentUserLastName } from "../../../store/slices/auth";
 
 const getFirstNameByUser = (user: IUser | null): string => {
     if (!user) {
@@ -18,20 +18,41 @@ const getFirstNameByUser = (user: IUser | null): string => {
     return user.firstName;
 };
 
+const getLastNameByUser = (user: IUser | null): string => {
+    if (!user) {
+        return "";
+    }
+    if (!user.lastName) {
+        return "";
+    }
+    return user.lastName;
+};
+
 const ModalContentName: FC = () => {
 
     const { user } = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
     const [firstName, setFirstName] = useState(getFirstNameByUser(user));
+    const [lastName, setLastName] = useState(getLastNameByUser(user));
     const { enqueueSnackbar } = useSnackbar();
     const [updateFirstName, { isLoading: updateFirstNameIsLoading }] = userApi.useFetchUpdateFirstnameMutation();
+    const [updateLastName, { isLoading: updateLastNameIsLoading }] = userApi.useFetchUpdateLastnameMutation();
 
-    const onClickUpdateFirstName = async() => {
-        await updateFirstName({ firstName })
+    const onClickUpdateFirstName = () => {
+        updateFirstName({ firstName })
         .unwrap()
         .then((data) => {
             enqueueSnackbar("Имя успешно обновлено", { variant: "success" });
             dispatch(setCurrentUserFirstName(data.firstName!));
+        });
+    };
+
+    const onClickUpdateLastName = () => {
+        updateLastName({ lastName })
+        .unwrap()
+        .then((data) => {
+            enqueueSnackbar("Имя успешно обновлено", { variant: "success" });
+            dispatch(setCurrentUserLastName(data.lastName!));
         });
     };
 
@@ -46,18 +67,29 @@ const ModalContentName: FC = () => {
             } }
         >
             <Stack spacing={ 2 } direction={ "column" }>
-                <TextField
-                    fullWidth
-                    size="medium"
-                    color="secondary"
-                    label="Фамилия"
-                    variant="outlined"
-                />
                 <Stack spacing={ 1 } direction={ "row" }>
                     <TextField
                         fullWidth
                         size="medium"
-                        color="secondary"
+                        color="primary"
+                        label="Фамилия"
+                        variant="outlined"
+                        value={ lastName }
+                        onChange={ e => setLastName(e.target.value) }
+                    />
+                    <Button
+                        disabled={ user!.lastName === lastName || updateLastNameIsLoading }
+                        onClick={ onClickUpdateLastName }
+                    >
+                        Обновить фамилию
+                    </Button>
+                </Stack>
+
+                <Stack spacing={ 1 } direction={ "row" }>
+                    <TextField
+                        fullWidth
+                        size="medium"
+                        color="primary"
                         label="Имя"
                         variant="outlined"
                         value={ firstName }

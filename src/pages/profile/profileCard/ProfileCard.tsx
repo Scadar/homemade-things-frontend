@@ -34,7 +34,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ src, alt, title, openModal, childre
                     {
                         openModal &&
                         <IconButton onClick={ openModal }>
-                            <ModeEditOutlineIcon color="secondary"/>
+                            <ModeEditOutlineIcon color="primary"/>
                         </IconButton>
                     }
                 </Box>

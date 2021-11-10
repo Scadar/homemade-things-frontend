@@ -18,6 +18,13 @@ export const userApi = createApi({
                 method: "PUT",
                 body: { firstName }
             })
+        }),
+        fetchUpdateLastname: build.mutation<IUser, { lastName: string }>({
+            query: ({ lastName }) => ({
+                url: `/user/first-name`,
+                method: "PUT",
+                body: { lastName }
+            })
         })
     })
 });

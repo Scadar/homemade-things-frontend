@@ -68,7 +68,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ type, setType }) => {
                 <Typography
                     sx={ { fontWeight: "bold", fontSize: "26px" } }
                     variant="h5"
-                    component={"span"}
+                    component={ "span" }
                 >
                     { currentModalData.title }
                 </Typography>
