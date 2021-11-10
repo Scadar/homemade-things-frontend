@@ -2,7 +2,7 @@ import { BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from "@re
 import { getTokenFromLocalStorage, setTokenToLocalStorage, TokenType } from "../../utils/localStorage";
 import { logout } from "../../store/slices/auth";
 
-const baseUrl = process.env.REACT_APP_REQUEST_URL
+export const baseUrl = process.env.REACT_APP_REQUEST_URL
 
 const queryWithoutAuthHeader = fetchBaseQuery({
     baseUrl: baseUrl
