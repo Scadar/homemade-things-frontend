@@ -13,6 +13,7 @@ import PieChartOutlineRoundedIcon from "@mui/icons-material/PieChartOutlineRound
 import Profile from "../pages/profile/Profile";
 import MapsHomeWorkIcon from "@mui/icons-material/MapsHomeWork";
 import SellerPersonalAccount from "../pages/sellerPersonalAccount/SellerPersonalAccount";
+import SelectedGood from "../pages/selectedGood/SelectedGood";
 
 type RouteType = {
     exact: boolean
@@ -69,5 +70,12 @@ export const routes: RouteType[] = [
         Component: Profile,
         path: "/profile",
         roles: null
+    },
+    {
+        exact: true,
+        Component: SelectedGood,
+        path: "/selectedGood/:id",
+        roles: null
     }
+
 ];
