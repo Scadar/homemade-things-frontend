@@ -10,13 +10,13 @@ import ProfileModal from "./modalWindowProfile/ProfileModal";
 import ProfileCard, { ProfileCardProps } from "./profileCard/ProfileCard";
 import SexCard from "./profileCard/SexCard";
 import UserCard from "./profileCard/UserCard";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { useAppSelector } from "../../hooks/redux";
 import { IUser } from "../../models/userModel";
 import { flexStyles } from "../../utils/styleUtils";
 import { userApi } from "../../services/userService";
 import { Role, useRoleManager } from "../../utils/roleUtils";
 import { useSnackbar } from "notistack";
-import { logout } from "../../store/slices/auth";
+import { authApi } from "../../services/authService";
 
 export type ProfileModalType = "birthday" | "email" | "name" | "phone"
 
@@ -45,18 +45,21 @@ const getFullName = (user: IUser | null): string => {
 const Profile: FC = () => {
 
     const [addSellerRole, { isLoading: addSellerRoleLoading }] = userApi.useFetchAddSellerRoleMutation();
+    const [refreshUser, { isLoading: refreshUserLoading }] = authApi.useFetchRefreshMutation();
     const hasAnyRole = useRoleManager();
     const { user } = useAppSelector(state => state.auth);
     const [modal, setModal] = useState<ProfileModalType | null>(null);
     const { enqueueSnackbar } = useSnackbar();
-    const dispatch = useAppDispatch();
 
     const onClickAddSellerRole = () => {
         addSellerRole()
         .unwrap()
         .then(() => {
-            enqueueSnackbar("Роль успешно добавлена, перезайдите в аккаунт", { variant: "success" });
-            dispatch(logout());
+            refreshUser()
+            .unwrap()
+            .then(() => {
+                enqueueSnackbar("Роль успешно добавлена", { variant: "success" });
+            });
         });
     };
 
@@ -147,7 +150,7 @@ const Profile: FC = () => {
                                 height: theme => theme.spacing(5),
                                 ml: "auto"
                             } }
-                            disabled={ addSellerRoleLoading }
+                            disabled={ addSellerRoleLoading || refreshUserLoading }
                             onClick={ onClickAddSellerRole }
                         >
                             Войти как продавец

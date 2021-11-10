@@ -1,12 +1,13 @@
 import React, { FC, useState } from "react";
-import { Button, Stack } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { userApi } from "../../../services/userService";
-import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import { useAppSelector } from "../../../hooks/redux";
 import { useSnackbar } from "notistack";
 import { IUser } from "../../../models/userModel";
-import { setCurrentUserFirstName, setCurrentUserLastName } from "../../../store/slices/auth";
+import { authApi } from "../../../services/authService";
+import CheckIcon from "@mui/icons-material/Check";
 
 const getFirstNameByUser = (user: IUser | null): string => {
     if (!user) {
@@ -31,28 +32,34 @@ const getLastNameByUser = (user: IUser | null): string => {
 const ModalContentName: FC = () => {
 
     const { user } = useAppSelector(state => state.auth);
-    const dispatch = useAppDispatch();
     const [firstName, setFirstName] = useState(getFirstNameByUser(user));
     const [lastName, setLastName] = useState(getLastNameByUser(user));
     const { enqueueSnackbar } = useSnackbar();
     const [updateFirstName, { isLoading: updateFirstNameIsLoading }] = userApi.useFetchUpdateFirstnameMutation();
     const [updateLastName, { isLoading: updateLastNameIsLoading }] = userApi.useFetchUpdateLastnameMutation();
+    const [refreshUser, { isLoading: refreshLoading }] = authApi.useFetchRefreshMutation();
 
     const onClickUpdateFirstName = () => {
         updateFirstName({ firstName })
         .unwrap()
-        .then((data) => {
-            enqueueSnackbar("Имя успешно обновлено", { variant: "success" });
-            dispatch(setCurrentUserFirstName(data.firstName!));
+        .then(() => {
+            refreshUser()
+            .unwrap()
+            .then(() => {
+                enqueueSnackbar("Имя успешно обновлено", { variant: "success" });
+            });
         });
     };
 
     const onClickUpdateLastName = () => {
         updateLastName({ lastName })
         .unwrap()
-        .then((data) => {
-            enqueueSnackbar("Имя успешно обновлено", { variant: "success" });
-            dispatch(setCurrentUserLastName(data.lastName!));
+        .then(() => {
+            refreshUser()
+            .unwrap()
+            .then(() => {
+                enqueueSnackbar("Фамилия успешно обновлена", { variant: "success" });
+            });
         });
     };
 
@@ -77,12 +84,14 @@ const ModalContentName: FC = () => {
                         value={ lastName }
                         onChange={ e => setLastName(e.target.value) }
                     />
-                    <Button
-                        disabled={ user!.lastName === lastName || updateLastNameIsLoading }
-                        onClick={ onClickUpdateLastName }
-                    >
-                        Обновить фамилию
-                    </Button>
+                    <Box>
+                        <IconButton
+                            disabled={ user!.lastName === lastName || updateLastNameIsLoading || refreshLoading }
+                            onClick={ onClickUpdateLastName }
+                        >
+                            <CheckIcon/>
+                        </IconButton>
+                    </Box>
                 </Stack>
 
                 <Stack spacing={ 1 } direction={ "row" }>
@@ -95,14 +104,15 @@ const ModalContentName: FC = () => {
                         value={ firstName }
                         onChange={ (e) => setFirstName(e.target.value) }
                     />
-                    <Button
-                        disabled={ user!.firstName === firstName || updateFirstNameIsLoading }
-                        onClick={ onClickUpdateFirstName }
-                    >
-                        Обновить имя
-                    </Button>
+                    <Box>
+                        <IconButton
+                            disabled={ user!.firstName === firstName || updateFirstNameIsLoading || refreshLoading }
+                            onClick={ onClickUpdateFirstName }
+                        >
+                            <CheckIcon/>
+                        </IconButton>
+                    </Box>
                 </Stack>
-
             </Stack>
         </Box>
     );

@@ -16,6 +16,7 @@ type ModalData = {
     type: ProfileModalType
     Component: React.ReactNode
     title: string
+    withoutOk?: boolean
 }
 
 const modalData: ModalData[] = [
@@ -32,7 +33,8 @@ const modalData: ModalData[] = [
     {
         type: "name",
         Component: <ModalContentName/>,
-        title: "Ваше имя"
+        title: "Ваше имя",
+        withoutOk: true
     },
     {
         type: "phone",
@@ -77,7 +79,10 @@ const ProfileModal: FC<ProfileModalProps> = ({ type, setType }) => {
                 { currentModalData.Component }
             </DialogContent>
             <DialogActions>
-                <Button onClick={ handleClose }>Ok</Button>
+                {
+                    !currentModalData.withoutOk &&
+                    <Button onClick={ handleClose }>Ok</Button>
+                }
                 <Button onClick={ handleClose } autoFocus>
                     Close
                 </Button>

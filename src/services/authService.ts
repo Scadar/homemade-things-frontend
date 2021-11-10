@@ -58,6 +58,26 @@ export const authApi = createApi({
                 method: "POST",
                 body: { email, password, registerAsAdmin, username }
             })
+        }),
+        fetchRefresh: build.mutation<{ accessToken: string }, void>({
+            query: () => ({
+                url: "/auth/refresh",
+                method: "POST",
+                body: { refreshToken: getTokenFromLocalStorage(TokenType.REFRESH) }
+            }),
+            extraOptions: {
+                disableToken: true
+            },
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    const user = parseJwt<IUser>(data.accessToken);
+                    setTokenToLocalStorage(TokenType.ACCESS, data.accessToken);
+                    dispatch(setAuthUser(user));
+                } catch (e) {
+                    dispatch(logout());
+                }
+            }
         })
     })
 });
