@@ -38,7 +38,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ src, alt, title, openModal, childre
                         </IconButton>
                     }
                 </Box>
-                { children }
+                { children &&  children }
             </CardContent>
         </Card>
     );
